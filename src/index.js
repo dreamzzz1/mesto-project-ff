@@ -3,13 +3,6 @@ import { openModal, closeModal, setOverlayClickHandler } from './components/moda
 import { initialCards } from './cards.js';
 import './pages/index.css';
 
-
-import logo from './images/logo.svg';
-import avatar from './images/avatar.jpg';
-
-document.querySelector('.logo').src = logo;
-document.querySelector('.profile__image').style.backgroundImage = `url(${avatar})`;
-
 const profileEditPopup = document.querySelector('.popup_type_edit');
 const addCardPopup = document.querySelector('.popup_type_new-card');
 const imagePopup = document.querySelector('.popup_type_image');
@@ -27,6 +20,9 @@ const addCardForm = addCardPopup.querySelector('form[name="new-place"]');
 
 const nameInput = profileEditForm.querySelector('.popup__input_type_name');
 const descriptionInput = profileEditForm.querySelector('.popup__input_type_description');
+
+const cardNameInput = addCardForm.querySelector('.popup__input_type_card-name'); 
+const cardLinkInput = addCardForm.querySelector('.popup__input_type_url');
 
 const imagePopupImg = imagePopup.querySelector('.popup__image');
 const imagePopupCaption = imagePopup.querySelector('.popup__caption');
@@ -53,14 +49,15 @@ addCardOpenBtn.addEventListener('click', () => {
 
 addCardForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
-  const cardName = addCardForm.querySelector('.popup__input_type_card-name').value;
-  const cardLink = addCardForm.querySelector('.popup__input_type_url').value;
 
-  const newCard = createCard({ name: cardName, link: cardLink }, {
-    onDelete: handleDeleteCard,
-    onLike: handleLikeCard,
-    onImageClick: openImagePopup,
-  });
+  const newCard = createCard(
+    { name: cardNameInput.value, link: cardLinkInput.value },
+    {
+      onDelete: handleDeleteCard,
+      onLike: handleLikeCard,
+      onImageClick: openImagePopup,
+    }
+  );
 
   placesList.prepend(newCard);
   closeModal(addCardPopup);
@@ -73,10 +70,8 @@ function openImagePopup(cardData) {
   openModal(imagePopup);
 }
 
-
-
 const fragment = document.createDocumentFragment();
-initialCards.forEach(cardData => {
+initialCards.forEach((cardData) => {
   const cardElement = createCard(cardData, {
     onDelete: handleDeleteCard,
     onLike: handleLikeCard,
