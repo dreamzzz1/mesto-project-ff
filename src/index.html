@@ -16,7 +16,9 @@
 
     <main class="content">
       <section class="profile page__section">
-        <div class="profile__image" style="background-image: url('images/avatar.jpg');" aria-label="Аватар"></div>
+        <div class="profile__image" aria-label="Аватар">
+          <img src="images/avatar.jpg" alt="Аватар пользователя" class="profile__avatar" />
+        </div>
         <div class="profile__info">
           <h1 class="profile__title">Жак-Ив Кусто</h1>
           <button class="profile__edit-button" type="button" aria-label="Редактировать профиль"></button>
@@ -26,8 +28,7 @@
       </section>
 
       <section class="places page__section">
-        <ul class="places__list">
-        </ul>
+        <ul class="places__list"></ul>
       </section>
     </main>
 
@@ -40,8 +41,32 @@
         <button type="button" class="popup__close" aria-label="Закрыть"></button>
         <h3 class="popup__title">Редактировать профиль</h3>
         <form class="popup__form" name="edit-profile" novalidate>
-          <input type="text" name="name" class="popup__input popup__input_type_name" placeholder="Имя" required minlength="2" maxlength="40" />
-          <input type="text" name="description" class="popup__input popup__input_type_description" placeholder="Занятие" required minlength="2" maxlength="200" />
+          <input
+            id="profile-name"
+            type="text"
+            name="name"
+            class="popup__input popup__input_type_name"
+            placeholder="Имя"
+            required
+            minlength="2"
+            maxlength="40"
+            data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+          />
+          <span id="profile-name-error" class="popup__error"></span>
+
+          <input
+            id="profile-description"
+            type="text"
+            name="description"
+            class="popup__input popup__input_type_description"
+            placeholder="Занятие"
+            required
+            minlength="2"
+            maxlength="200"
+            data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+          />
+          <span id="profile-description-error" class="popup__error"></span>
+
           <button type="submit" class="button popup__button">Сохранить</button>
         </form>
       </div>
@@ -52,8 +77,29 @@
         <button type="button" class="popup__close" aria-label="Закрыть"></button>
         <h3 class="popup__title">Новое место</h3>
         <form class="popup__form" name="new-place" novalidate>
-          <input type="text" name="place-name" class="popup__input popup__input_type_card-name" placeholder="Название" required minlength="1" maxlength="30" />
-          <input type="url" name="link" class="popup__input popup__input_type_url" placeholder="Ссылка на картинку" required />
+          <input
+            id="place-name"
+            type="text"
+            name="place-name"
+            class="popup__input popup__input_type_card-name"
+            placeholder="Название"
+            required
+            minlength="2"
+            maxlength="30"
+            data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+          />
+          <span id="place-name-error" class="popup__error"></span>
+
+          <input
+            id="place-url"
+            type="url"
+            name="link"
+            class="popup__input popup__input_type_url"
+            placeholder="Ссылка на картинку"
+            required
+          />
+          <span id="place-url-error" class="popup__error"></span>
+
           <button type="submit" class="button popup__button">Сохранить</button>
         </form>
       </div>
@@ -67,6 +113,7 @@
       </div>
     </div>
   </div>
+
   <template id="card-template">
     <li class="places__item card">
       <img class="card__image" src="#" alt="" />
