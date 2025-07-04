@@ -18,14 +18,10 @@ const hideInputError = (formElement, inputElement, config) => {
 const isNameValid = (value) => /^[а-яА-ЯёЁa-zA-Z\s\-]+$/.test(value);
 
 const checkInputValidity = (formElement, inputElement, config) => {
-  const nameFields = ['name', 'description', 'place-name'];
-
-  if (nameFields.includes(inputElement.name)) {
-    if (!isNameValid(inputElement.value)) {
-      const message = inputElement.dataset.errorMessage || 'Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы';
-      showInputError(formElement, inputElement, message, config);
-      return;
-    }
+  if (inputElement.validity.patternMismatch) {
+    const message = inputElement.dataset.errorMessage || inputElement.validationMessage;
+    showInputError(formElement, inputElement, message, config);
+    return;
   }
 
   if (!inputElement.validity.valid) {
@@ -34,6 +30,7 @@ const checkInputValidity = (formElement, inputElement, config) => {
     hideInputError(formElement, inputElement, config);
   }
 };
+
 
 const hasInvalidInput = (inputList) => {
   return inputList.some((input) => !input.validity.valid);

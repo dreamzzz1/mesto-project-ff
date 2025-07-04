@@ -4,9 +4,12 @@
   "description": "https://github.com/dreamzzz1/mesto-project-ff",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --mode production",
-    "dev": "webpack serve"
+  "build": "webpack --mode production",
+  "dev": "webpack serve",
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist -r https://github.com/dreamzzz1/mesto-project-ff.git"
   },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dreamzzz1/mesto-project-ff.git"
@@ -30,6 +33,7 @@
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^7.1.2",
     "cssnano": "^7.0.7",
+    "gh-pages": "^6.3.0",
     "html-loader": "^5.1.0",
     "html-webpack-plugin": "^5.6.3",
     "mini-css-extract-plugin": "^2.9.2",

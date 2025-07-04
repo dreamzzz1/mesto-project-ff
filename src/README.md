@@ -1,3 +1,3 @@
 # Проектная работа Mesto
 
-https://github.com/dreamzzz1/mesto-project-ff
+https://dreamzzz1.github.io/mesto-project-ff/

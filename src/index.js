@@ -34,10 +34,8 @@ const editAvatarForm = editAvatarPopup.querySelector('form[name="edit-avatar"]')
 
 const nameInput = profileEditForm.querySelector('.popup__input_type_name');
 const descriptionInput = profileEditForm.querySelector('.popup__input_type_description');
-
 const cardNameInput = addCardForm.querySelector('.popup__input_type_card-name');
 const cardLinkInput = addCardForm.querySelector('.popup__input_type_url');
-
 const avatarUrlInput = editAvatarForm.querySelector('.popup__input_type_avatar-url');
 const avatarSaveButton = editAvatarForm.querySelector('.popup__button');
 
@@ -46,25 +44,21 @@ const imagePopupCaption = imagePopup.querySelector('.popup__caption');
 
 let userId = null;
 
-setOverlayClickHandler();
-
-const handleDeleteCard = (cardId, cardElement) => {
-  deleteCard(cardId)
-    .then(() => {
-      cardElement.remove();
-    })
-    .catch((err) => console.error('Ошибка при удалении карточки:', err));
+const validationConfig = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
 };
 
-const handleLikeCard = (cardId, isLiked, updateLikeView) => {
-  const likeAction = isLiked ? unlikeCard : likeCard;
-
-  likeAction(cardId)
-    .then((updatedCard) => {
-      updateLikeView(updatedCard.likes);
-    })
-    .catch((err) => console.error('Ошибка при постановке/снятии лайка:', err));
-};
+function openImagePopup(cardData) {
+  imagePopupImg.src = cardData.link;
+  imagePopupImg.alt = cardData.name;
+  imagePopupCaption.textContent = cardData.name;
+  openModal(imagePopup);
+}
 
 profileEditOpenBtn.addEventListener('click', () => {
   nameInput.value = profileName.textContent;
@@ -105,10 +99,20 @@ addCardForm.addEventListener('submit', (evt) => {
     .then((cardData) => {
       const newCard = createCard(cardData, {
         userId,
-        onDelete: handleDeleteCard,
-        onLike: handleLikeCard,
-        onImageClick: openImagePopup,
+        onDelete: (cardId, cardElement) => {
+          deleteCard(cardId)
+            .then(() => cardElement.remove())
+            .catch((err) => console.error('Ошибка при удалении карточки:', err));
+        },
+        onLike: (cardId, isLiked, updateLikeView) => {
+          const likeAction = isLiked ? unlikeCard : likeCard;
+          likeAction(cardId)
+            .then((updatedCard) => updateLikeView(updatedCard.likes))
+            .catch((err) => console.error('Ошибка при постановке/снятии лайка:', err));
+        },
+        onImageClick: openImagePopup
       });
+
       placesList.prepend(newCard);
       closeModal(addCardPopup);
     })
@@ -140,43 +144,35 @@ editAvatarForm.addEventListener('submit', (evt) => {
     });
 });
 
-function openImagePopup(cardData) {
-  imagePopupImg.src = cardData.link;
-  imagePopupImg.alt = cardData.name;
-  imagePopupCaption.textContent = cardData.name;
-  openModal(imagePopup);
-}
-
-const validationConfig = {
-  formSelector: '.popup__form',
-  inputSelector: '.popup__input',
-  submitButtonSelector: '.popup__button',
-  inactiveButtonClass: 'popup__button_disabled',
-  inputErrorClass: 'popup__input_type_error',
-  errorClass: 'popup__error_visible'
-};
-
 enableValidation(validationConfig);
+setOverlayClickHandler();
 
 Promise.all([getUserInfo(), getInitialCards()])
   .then(([userData, cards]) => {
     userId = userData._id;
-
     profileName.textContent = userData.name;
     profileDescription.textContent = userData.about;
-    if (userData.avatar) {
-      profileAvatar.src = userData.avatar;
-      profileAvatar.alt = userData.name;
-    }
+    profileAvatar.src = userData.avatar;
+    profileAvatar.alt = userData.name;
 
     cards.reverse().forEach((cardData) => {
       const cardElement = createCard(cardData, {
         userId,
-        onDelete: handleDeleteCard,
-        onLike: handleLikeCard,
-        onImageClick: openImagePopup,
+        onDelete: (cardId, cardElement) => {
+          deleteCard(cardId)
+            .then(() => cardElement.remove())
+            .catch((err) => console.error('Ошибка при удалении карточки:', err));
+        },
+        onLike: (cardId, isLiked, updateLikeView) => {
+          const likeAction = isLiked ? unlikeCard : likeCard;
+          likeAction(cardId)
+            .then((updatedCard) => updateLikeView(updatedCard.likes))
+            .catch((err) => console.error('Ошибка при постановке/снятии лайка:', err));
+        },
+        onImageClick: openImagePopup
       });
+
       placesList.append(cardElement);
     });
   })
-  .catch((err) => console.error('Ошибка:', err));
+  .catch((err) => console.error('Ошибка загрузки:', err));
