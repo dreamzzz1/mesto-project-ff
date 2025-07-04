@@ -1,31 +1,45 @@
-import { createCard, handleDeleteCard, handleLikeCard } from './components/card.js';
+import { createCard } from './components/card.js';
 import { openModal, closeModal, setOverlayClickHandler } from './components/modal.js';
-import { initialCards } from './cards.js';
 import './pages/index.css';
 import { enableValidation, clearValidation } from './components/validation.js';
-import { getUserInfo, getInitialCards, updateUserInfo, addNewCard, deleteCard, likeCard, unlikeCard, updateUserAvatar } from './components/api.js';
+import {
+  getUserInfo,
+  getInitialCards,
+  updateUserInfo,
+  addNewCard,
+  deleteCard,
+  likeCard,
+  unlikeCard,
+  updateUserAvatar
+} from './components/api.js';
 
 const profileEditPopup = document.querySelector('.popup_type_edit');
 const addCardPopup = document.querySelector('.popup_type_new-card');
 const imagePopup = document.querySelector('.popup_type_image');
+const editAvatarPopup = document.querySelector('.popup_type_edit-avatar');
 
 const profileEditOpenBtn = document.querySelector('.profile__edit-button');
 const addCardOpenBtn = document.querySelector('.profile__add-button');
+const profileAvatar = document.querySelector('.profile__avatar');
+const profileAvatarEditBtn = document.querySelector('.profile__avatar-edit-button');
 
 const placesList = document.querySelector('.places__list');
 
 const profileName = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
-const profileAvatar = document.querySelector('.profile__avatar');
 
 const profileEditForm = profileEditPopup.querySelector('form[name="edit-profile"]');
 const addCardForm = addCardPopup.querySelector('form[name="new-place"]');
+const editAvatarForm = editAvatarPopup.querySelector('form[name="edit-avatar"]');
 
 const nameInput = profileEditForm.querySelector('.popup__input_type_name');
 const descriptionInput = profileEditForm.querySelector('.popup__input_type_description');
 
-const cardNameInput = addCardForm.querySelector('.popup__input_type_card-name'); 
+const cardNameInput = addCardForm.querySelector('.popup__input_type_card-name');
 const cardLinkInput = addCardForm.querySelector('.popup__input_type_url');
+
+const avatarUrlInput = editAvatarForm.querySelector('.popup__input_type_avatar-url');
+const avatarSaveButton = editAvatarForm.querySelector('.popup__button');
 
 const imagePopupImg = imagePopup.querySelector('.popup__image');
 const imagePopupCaption = imagePopup.querySelector('.popup__caption');
@@ -33,6 +47,24 @@ const imagePopupCaption = imagePopup.querySelector('.popup__caption');
 let userId = null;
 
 setOverlayClickHandler();
+
+const handleDeleteCard = (cardId, cardElement) => {
+  deleteCard(cardId)
+    .then(() => {
+      cardElement.remove();
+    })
+    .catch((err) => console.error('Ошибка при удалении карточки:', err));
+};
+
+const handleLikeCard = (cardId, isLiked, updateLikeView) => {
+  const likeAction = isLiked ? unlikeCard : likeCard;
+
+  likeAction(cardId)
+    .then((updatedCard) => {
+      updateLikeView(updatedCard.likes);
+    })
+    .catch((err) => console.error('Ошибка при постановке/снятии лайка:', err));
+};
 
 profileEditOpenBtn.addEventListener('click', () => {
   nameInput.value = profileName.textContent;
@@ -86,6 +118,28 @@ addCardForm.addEventListener('submit', (evt) => {
     });
 });
 
+profileAvatarEditBtn.addEventListener('click', () => {
+  editAvatarForm.reset();
+  clearValidation(editAvatarForm, validationConfig);
+  openModal(editAvatarPopup);
+});
+
+editAvatarForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  avatarSaveButton.textContent = 'Сохранение...';
+
+  updateUserAvatar(avatarUrlInput.value)
+    .then((userData) => {
+      profileAvatar.src = userData.avatar;
+      profileAvatar.alt = userData.name;
+      closeModal(editAvatarPopup);
+    })
+    .catch((err) => console.error('Ошибка при обновлении аватара:', err))
+    .finally(() => {
+      avatarSaveButton.textContent = 'Сохранить';
+    });
+});
+
 function openImagePopup(cardData) {
   imagePopupImg.src = cardData.link;
   imagePopupImg.alt = cardData.name;
@@ -106,7 +160,7 @@ enableValidation(validationConfig);
 
 Promise.all([getUserInfo(), getInitialCards()])
   .then(([userData, cards]) => {
-    userId = userData._id; 
+    userId = userData._id;
 
     profileName.textContent = userData.name;
     profileDescription.textContent = userData.about;
